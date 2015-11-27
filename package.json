@@ -1,0 +1,30 @@
+{
+  "name": "crossfire",
+  "version": "1.0.0",
+  "description": "A realtime multiplayer game",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Nalinc/crossfire.git"
+  },
+  "keywords": [
+    "websocket",
+    "multiplayer",
+    "game"
+  ],
+  "author": "nalinc",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Nalinc/crossfire/issues"
+  },
+  "homepage": "https://github.com/Nalinc/crossfire",
+  "dependencies": {
+    "express": "^4.0.0"
+  },
+  "engines": {
+    "node": "0.12.x"
+  }
+}
