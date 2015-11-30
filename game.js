@@ -1,10 +1,21 @@
 /**************************************************
 ** NODE.JS REQUIREMENTS
 **************************************************/
-var util = require("util"),					// Utility resources (logging, object inspection, etc)
-	io = require("socket.io"),				// Socket.IO
-	Player = require("./Player").Player;	// Player class
+var express = require('express')
+var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
 
+var Player = require("./Player").Player;	// Player class
+
+
+
+app.set('port', (process.env.PORT || 8000))
+app.use(express.static(__dirname + '/public/'));
+
+app.get('/', function(request, response) {
+  response.render('index.html')
+})
 
 /**************************************************
 ** GAME VARIABLES
@@ -20,34 +31,22 @@ function init() {
 	// Create an empty array to store players
 	players = [];
 
-	// Set up Socket.IO to listen on port 8000
-	socket = io.listen(8000);
+	server.listen(app.get('port'), function() {
+	  console.log("Node app is running at localhost:" + app.get('port'))
+	})
 
-	// Configure Socket.IO
-	socket.configure(function() {
-		// Only use WebSockets
-		socket.set("transports", ["websocket"]);
+	io.on('connection',onSocketConnection);
 
-		// Restrict log output
-		socket.set("log level", 2);
-	});
-
-	// Start listening for events
-	setEventHandlers();
 };
 
 
 /**************************************************
 ** GAME EVENT HANDLERS
 **************************************************/
-var setEventHandlers = function() {
-	// Socket.IO
-	socket.sockets.on("connection", onSocketConnection);
-};
 
 // New socket connection
 function onSocketConnection(client) {
-	util.log("New player has connected: "+client.id);
+	console.log("New player has connected: "+client.id);
 
 	// Listen for client disconnected
 	client.on("disconnect", onClientDisconnect);
@@ -61,13 +60,13 @@ function onSocketConnection(client) {
 
 // Socket client has disconnected
 function onClientDisconnect() {
-	util.log("Player has disconnected: "+this.id);
+	console.log("Player has disconnected: "+this.id);
 
 	var removePlayer = playerById(this.id);
 
 	// Player not found
 	if (!removePlayer) {
-		util.log("Player not found: "+this.id);
+		console.log("Player not found: "+this.id);
 		return;
 	};
 
@@ -80,18 +79,20 @@ function onClientDisconnect() {
 
 // New player has joined
 function onNewPlayer(data) {
+
+	var shiptype = Math.floor(Math.random() * 9) + 0 ;
 	// Create a new player
-	var newPlayer = new Player(data.x, data.y);
+	var newPlayer = new Player(data.x, data.y, data.type);
 	newPlayer.id = this.id;
 
 	// Broadcast new player to connected socket clients
-	this.broadcast.emit("new player", {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY(), angle: newPlayer.getAngle()});
+	this.broadcast.emit("new player", {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY(), angle: newPlayer.getAngle(), type: newPlayer.getType()});
 
 	// Send existing players to the new player
 	var i, existingPlayer;
 	for (i = 0; i < players.length; i++) {
 		existingPlayer = players[i];
-		this.emit("new player", {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY(), angle: existingPlayer.getAngle()});
+		this.emit("new player", {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY(), angle: existingPlayer.getAngle(), type: existingPlayer.getType()});
 	};
 		
 	// Add new player to the players array
@@ -105,7 +106,7 @@ function onMovePlayer(data) {
 
 	// Player not found
 	if (!movePlayer) {
-		util.log("Player not found: "+this.id);
+		console.log("Player not found: "+this.id);
 		return;
 	};
 
@@ -113,9 +114,10 @@ function onMovePlayer(data) {
 	movePlayer.setX(data.x);
 	movePlayer.setY(data.y);
 	movePlayer.setAngle(data.angle);
+	movePlayer.setType(data.type);
 
 	// Broadcast updated position to connected socket clients
-	this.broadcast.emit("move player", {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), angle: movePlayer.getAngle()});
+	this.broadcast.emit("move player", {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), angle: movePlayer.getAngle(), type: movePlayer.getType()});
 };
 
 

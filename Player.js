@@ -1,10 +1,11 @@
 /**************************************************
 ** GAME PLAYER CLASS
 **************************************************/
-var Player = function(startX, startY) {
+var Player = function(startX, startY, type) {
 	var x = startX,
 		y = startY,
 		angle = 5,
+		shipType = type,
 		id;
 
 	// Getters and setters
@@ -19,6 +20,10 @@ var Player = function(startX, startY) {
 	var getAngle = function() {
 		return angle;
 	};
+	
+	var getType = function() {
+		return shipType;
+	};	
 
 	var setX = function(newX) {
 		x = newX;
@@ -32,14 +37,20 @@ var Player = function(startX, startY) {
 		angle = newAngle;
 	};
 
+	var setType = function(newType) {
+		shipType = newType;
+	};	
+
 	// Define which variables and methods can be accessed
 	return {
 		getX: getX,
 		getY: getY,
 		getAngle: getAngle,
+		getType: getType,
 		setX: setX,
 		setY: setY,
-		setAngle: setAngle,		
+		setAngle: setAngle,
+		setType: setType,
 		id: id
 	}
 };
