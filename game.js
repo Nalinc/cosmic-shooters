@@ -115,9 +115,8 @@ function onMovePlayer(data) {
 	movePlayer.setY(data.y);
 	movePlayer.setAngle(data.angle);
 	movePlayer.setType(data.type);
-
 	// Broadcast updated position to connected socket clients
-	this.broadcast.emit("move player", {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), angle: movePlayer.getAngle(), type: movePlayer.getType()});
+	this.broadcast.emit("move player", {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), angle: movePlayer.getAngle(), type: movePlayer.getType(), isFiring: data.isFiring});
 };
 
 

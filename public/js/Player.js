@@ -37,14 +37,16 @@
 	Bullet.prototype.draw = function(ctx, xView, yView) {
 		ctx.clearRect(this.x, this.y, this.width, this.height);
 //		this.y -= this.speed;
-		this.y += this.speed * Math.cos(this.angle/180*Math.PI);
+		this.y -= this.speed * Math.cos(this.angle/180*Math.PI);
 		this.x += this.speed * Math.sin(this.angle/180*Math.PI);
 		if (this.y <= 0 - this.height) {
 			return true;
 		}
 		else {
 			ctx.save();
-			ctx.drawImage(this.fire,this.x,this.y);
+//	    	ctx.translate(localPlayer.x,localPlayer.y);
+			ctx.fillStyle = '#ff0000';
+			ctx.fillRect(this.x,this.y,5,5); 
 			ctx.restore();
 //			ctx.drawImage(this.fire, localPlayer.x, localPlayer.y);
 		}
@@ -137,8 +139,9 @@
 		this.shipType= type;
 		this.bulletPool = new Game.Pool(30);
 		this.bulletPool.init();
-		var fireRate = 15;
-		var counter = 0;
+		this.fireRate = 15;
+		this.counter = 0;
+		this.isFiring = false;
 
 		this.angle = this.orientation || 5;
 		this.id=''
@@ -187,16 +190,21 @@
 			this.shipType = newType;
 		};
 
-		this.fire = function() {
-			this.bulletPool.get(this.angle, 100, 100, 3);
+		this.fire = function(xcord, ycord, direction) {
+			console.log('fire fire')
+			this.bulletPool.get(xcord, ycord , direction, 3);
 		};		
 
 	}
 	
 	Player.prototype.update = function(step, worldWidth, worldHeight){
 			var prevX = this.x,
-				prevY = this.y;
-
+				prevY = this.y,
+				prevAngle = this.angle;
+			this.isFiring = false;
+			
+			this.counter++;
+				
 			// Up key takes priority over down
 			if (keys.up) {
 				this.y -= this.	moveAmount * Math.cos(this.angle/180*Math.PI);
@@ -219,22 +227,25 @@
 				this.angle += this.	moveAmount;
 			};
 
-			if (keys.space) {
+			if (keys.space && this.counter >= this.fireRate) {
 				console.log('fire');
-				this.fire();
-				counter = 0;
+				this.fire(this.x-camera.xView, this.y-camera.yView, this.angle);
+				this.counter = 0;
+				this.isFiring = true;
 			}
 
-			return (prevX != this.x || prevY != this.y) ? true : false;
+			return (prevX != this.x || prevY != this.y || prevAngle != this.angle || this.isFiring) ? true : false;
 	}
 	
 	Player.prototype.draw = function(context, xView, yView){		
 		// draw a simple rectangle shape as our player model
 
 		context.save();
-    	context.translate((this.x-this.width/2) - xView+this.ship.width/2, (this.y-this.height/2) - yView+this.ship.height/2);
+    	context.translate((this.x-32) - xView+32, (this.y-32) - yView+32);
 		context.rotate(Math.PI / 180 * (this.angle));
-		context.drawImage(this.ship,-this.ship.width/2,-this.ship.height/2,64,64);
+//		context.fillStyle = 'red'
+//		context.fillRect(-this.ship.width/2,-this.ship.height/2,64,64)
+		context.drawImage(this.ship,-32,-32,64,64);
 		context.restore();
 
 /*

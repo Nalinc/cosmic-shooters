@@ -61,7 +61,7 @@ function init() {
 	camera.follow(localPlayer, canvas.width/2, canvas.height/2);
 
 	// Initialise socket connection
-	socket = io.connect('192.168.1.57:8000');
+	socket = io.connect('http://localhost:8000');
 
 	// Initialise remote players array
 	remotePlayers = [];
@@ -158,7 +158,10 @@ function onMovePlayer(data) {
 	movePlayer.setX(data.x);
 	movePlayer.setY(data.y);
 	movePlayer.setAngle(data.angle);
-	movePlayer.setType(data.type);	
+	movePlayer.setType(data.type);
+	if(data.isFiring){
+		movePlayer.fire(movePlayer.getX(),movePlayer.getY(),movePlayer.getAngle());
+	}
 };
 
 // Remove player
@@ -196,7 +199,7 @@ function update() {
 	if (localPlayer.update(keys, room.width, room.height)) {
 		camera.update();
 		// Send local player data to the game server
-		socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY(), angle: localPlayer.getAngle(), type: localPlayer.getType()});
+		socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY(), angle: localPlayer.getAngle(), type: localPlayer.getType(), isFiring: localPlayer.isFiring});
 	};
 };
 
