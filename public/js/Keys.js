@@ -1,11 +1,12 @@
 /**************************************************
 ** GAME KEYBOARD CLASS
 **************************************************/
-var Keys = function(up, left, right, down) {
+var Keys = function(up, left, right, down, space) {
 	var up = up || false,
 		left = left || false,
 		right = right || false,
-		down = down || false;
+		down = down || false,
+		space = space || false;
 		
 	var onKeyDown = function(e) {
 		console.log(e)
@@ -13,6 +14,9 @@ var Keys = function(up, left, right, down) {
 			c = e.keyCode;
 		switch (c) {
 			// Controls
+			case 32: // Space
+				that.space = true;
+				break;
 			case 37: // Left
 				that.left = true;
 				break;
@@ -32,6 +36,9 @@ var Keys = function(up, left, right, down) {
 		var that = this,
 			c = e.keyCode;
 		switch (c) {
+			case 32: // Space
+				that.space = false;
+				break;
 			case 37: // Left
 				that.left = false;
 				break;
@@ -52,6 +59,7 @@ var Keys = function(up, left, right, down) {
 		left: left,
 		right: right,
 		down: down,
+		space: space,
 		onKeyDown: onKeyDown,
 		onKeyUp: onKeyUp
 	};

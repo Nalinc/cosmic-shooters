@@ -8,6 +8,7 @@ var canvas,			// Canvas DOM element
 	ctx,			// Canvas rendering context
 	keys,			// Keyboard input
 	localPlayer,	// Local player
+	bullet,
 	remotePlayers,	// Remote players
 	socket;			// Socket connection
 
@@ -212,6 +213,8 @@ function draw() {
 
 	// Draw the local player
 	localPlayer.draw(ctx, camera.xView, camera.yView);
+
+	localPlayer.bulletPool.animate(ctx,camera.xView, camera.yView);
     ctx.restore();
 
 	// Draw the remote players
