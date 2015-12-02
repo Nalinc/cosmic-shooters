@@ -9,6 +9,7 @@ var canvas,			// Canvas DOM element
 	keys,			// Keyboard input
 	localPlayer,	// Local player
 	bullet,
+	quadTree,
 	remotePlayers,	// Remote players
 	socket;			// Socket connection
 
@@ -42,13 +43,9 @@ function init() {
 		}
 		else
 			motionDetect = o;
-/*		"<p> y = " + o.y + "</p>" +
-		"<p> z = " + o.z + "</p>" +
-		"<p> alpha = " + o.alpha + "</p>" +
-		"<p> beta = " + o.beta + "</p>" +
-		"<p> gamma = " + o.gamma + "</p>";
-*/	});
+	});
 
+	quadTree = new QuadTree({x:0,y:0,width:canvas.width,height:canvas.height});
 
 	// setup an object that represents the room
 	room = {
@@ -76,7 +73,7 @@ function init() {
 	camera.follow(localPlayer, canvas.width/2, canvas.height/2);
 
 	// Initialise socket connection
-	socket = io.connect('192.168.1.57:8000');
+	socket = io.connect('http://localhost:8000');
 
 	// Initialise remote players array
 	remotePlayers = [];
@@ -202,6 +199,29 @@ function onRemovePlayer(data) {
 };
 
 
+function detectCollision() {
+	var objects = [];
+	quadTree.getAllObjects(objects);
+
+	for (var x = 0, len = objects.length; x < len; x++) {
+		quadTree.findObjects(obj = [], objects[x]);
+
+		for (y = 0, length = obj.length; y < length; y++) {
+
+			// DETECT COLLISION ALGORITHM
+			if (objects[x].collidableWith === obj[y].type &&
+				(objects[x].x < obj[y].x + obj[y].width &&
+			     objects[x].x + objects[x].width > obj[y].x &&
+				 objects[x].y < obj[y].y + obj[y].height &&
+				 objects[x].y + objects[x].height > obj[y].y))
+			{
+				objects[x].isColliding = true;
+				obj[y].isColliding = true;
+			}
+		}
+	}
+};
+
 /**************************************************
 ** GAME ANIMATION LOOP
 **************************************************/
@@ -231,6 +251,15 @@ function update() {
 ** GAME DRAW
 **************************************************/
 function draw() {
+
+	// Insert objects into quadtree
+	quadTree.clear();
+	quadTree.insert(localPlayer);
+	quadTree.insert(localPlayer.bulletPool.getPool());
+	quadTree.insert(remotePlayers);
+
+	detectCollision();
+
 	// Wipe the canvas clean
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -246,9 +275,11 @@ function draw() {
 	// Draw the remote players
 	var i;
 	for (i = 0; i < remotePlayers.length; i++) {
+		quadTree.insert(remotePlayers[i].bulletPool.getPool());
 		remotePlayers[i].draw(ctx,camera.xView, camera.yView);
 		remotePlayers[i].bulletPool.animate(ctx,camera.xView, camera.yView);
 	};
+
 };
 
 

@@ -15,6 +15,7 @@
 		this.alive = false; // Is true if the bullet is currently in use
 		this.count = 0;
 		this.speed=  3;
+		this.isColliding = false;
 	}
 	/*
 	 * Sets the bullet values
@@ -33,6 +34,10 @@
 	 * the bullet.
 	 */
 	Bullet.prototype.draw = function(ctx, xView, yView) {
+		if(this.isColliding){
+//			console.log('bullet collision')
+		}
+
 		ctx.clearRect(this.x, this.y, this.width, this.height);
 //		this.y -= this.speed;
 		this.y -= this.speed * Math.cos(this.angle/180*Math.PI);
@@ -121,6 +126,15 @@
 					break;
 			}
 		};
+		this.getPool = function() {
+			var obj = [];
+			for (var i = 0; i < size; i++) {
+				if (pool[i].alive) {
+					obj.push(pool[i]);
+				}
+			}
+			return obj;
+		}		
 	}
 	Game.Pool = Pool;
 })();
@@ -141,6 +155,7 @@
 		this.counter = 0;
 		this.isFiring = false;
 		this.fireTap = false;
+		this.isColliding = false;
 
 		this.angle = this.orientation || 1;
 		this.id=''
@@ -258,7 +273,9 @@
 				this.counter = 0;
 				this.isFiring = true;
 			}
-
+			if(this.isColliding){
+	//			console.log('player collision')
+			}
 			return (prevX != this.x || prevY != this.y || prevAngle != this.angle || this.isFiring) ? true : false;
 	}
 	
