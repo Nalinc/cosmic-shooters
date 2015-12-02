@@ -43,47 +43,52 @@ svg{
   width:100%;
   height:100%;
 }
-
 .arrow-up {
   display:inline;
   position:fixed;
   left:65px;
-  bottom:90px;
-	border-left: 20px solid transparent;
-	border-right: 20px solid transparent;
-
-	border-bottom: 20px solid blue;
+  bottom:118px;
+  width:48px;
+  height:48px;
+  background-image: url('../images/up.png');
 }
 
 .arrow-down {
   display:inline;
   position:fixed;
   left:65px;
-  bottom:20px;
-	border-left: 20px solid transparent;
-	border-right: 20px solid transparent;
-	
-	border-top: 20px solid blue;
+  bottom:45px;
+  width:48px;
+  height:48px;
+  background-image: url('../images/down.png');
 }
 
 .arrow-right {
   display:inline;
   position:fixed;
-  left:110px;
-  bottom:45px;
-	border-top: 20px solid transparent;
-	border-bottom: 20px solid transparent;
-	
-	border-left: 20px solid blue;
+  left:100px;
+  bottom:82px;
+  width:48px;
+  height:48px;
+  background-image: url('../images/right.png');  
 }
 
 .arrow-left {
   display:inline;
   position:fixed;
-  left:40px;
-  bottom:45px;
-	border-top: 20px solid transparent;
-	border-bottom: 20px solid transparent; 
-	
-	border-right:20px solid blue; 
+  left:30px;
+  bottom:82px;
+  width:48px;
+  height:48px;
+  background-image: url('../images/left.png');  
+}
+
+.btn-shoot{
+  display:inline;
+  position:fixed;
+  right:75px;
+  bottom:82px;
+  width:48px;
+  height:48px;
+  background-image: url('../images/shoot.png'); 
 }

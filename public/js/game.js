@@ -35,6 +35,21 @@ function init() {
 	// Initialise keyboard controls
 	keys = new Keys();
 
+	gyro.startTracking(function(o) {
+		if(o.x==null){
+			motionDetect.x=0;
+			motionDetect.y=0;
+		}
+		else
+			motionDetect = o;
+/*		"<p> y = " + o.y + "</p>" +
+		"<p> z = " + o.z + "</p>" +
+		"<p> alpha = " + o.alpha + "</p>" +
+		"<p> beta = " + o.beta + "</p>" +
+		"<p> gamma = " + o.gamma + "</p>";
+*/	});
+
+
 	// setup an object that represents the room
 	room = {
 		width: 5000,
@@ -61,7 +76,7 @@ function init() {
 	camera.follow(localPlayer, canvas.width/2, canvas.height/2);
 
 	// Initialise socket connection
-	socket = io.connect('http://localhost:8000');
+	socket = io.connect('192.168.1.57:8000');
 
 	// Initialise remote players array
 	remotePlayers = [];
@@ -78,6 +93,14 @@ var setEventHandlers = function() {
 	// Keyboard
 	window.addEventListener("keydown", onKeydown, false);
 	window.addEventListener("keyup", onKeyup, false);
+
+	var el = document.getElementById("gameCanvas");
+	el.addEventListener("touchstart", function(){
+		localPlayer.fireTap = true;
+	}, false);
+	el.addEventListener("touchend", function(){
+		localPlayer.fireTap = false;
+	}, false);	
 
 	// Window resize
 	window.addEventListener("resize", onResize, false);
@@ -160,7 +183,7 @@ function onMovePlayer(data) {
 	movePlayer.setAngle(data.angle);
 	movePlayer.setType(data.type);
 	if(data.isFiring){
-		movePlayer.fire(movePlayer.getX(),movePlayer.getY(),movePlayer.getAngle());
+		movePlayer.fire(movePlayer.getX()-camera.xView,movePlayer.getY()-camera.yView,movePlayer.getAngle());
 	}
 };
 
@@ -224,6 +247,7 @@ function draw() {
 	var i;
 	for (i = 0; i < remotePlayers.length; i++) {
 		remotePlayers[i].draw(ctx,camera.xView, camera.yView);
+		remotePlayers[i].bulletPool.animate(ctx,camera.xView, camera.yView);
 	};
 };
 

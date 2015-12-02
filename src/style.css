@@ -44,10 +44,9 @@ svg{
   position:fixed;
   left:65px;
   bottom:90px;
-	border-left: 20px solid transparent;
-	border-right: 20px solid transparent;
-
-	border-bottom: 20px solid blue;
+  width:64px;
+  height:64px;
+  background-image: url('../images/up.png');
 }
 
 .arrow-down {
@@ -55,10 +54,9 @@ svg{
   position:fixed;
   left:65px;
   bottom:20px;
-	border-left: 20px solid transparent;
-	border-right: 20px solid transparent;
-	
-	border-top: 20px solid blue;
+  width:64px;
+  height:64px;
+  background-image: url('../images/down.png');
 }
 
 .arrow-right {
@@ -66,10 +64,9 @@ svg{
   position:fixed;
   left:110px;
   bottom:45px;
-	border-top: 20px solid transparent;
-	border-bottom: 20px solid transparent;
-	
-	border-left: 20px solid blue;
+  width:64px;
+  height:64px;
+  background-image: url('../images/right.png');  
 }
 
 .arrow-left {
@@ -77,8 +74,7 @@ svg{
   position:fixed;
   left:40px;
   bottom:45px;
-	border-top: 20px solid transparent;
-	border-bottom: 20px solid transparent; 
-	
-	border-right:20px solid blue; 
+  width:64px;
+  height:64px;
+  background-image: url('../images/left.png');  
 }

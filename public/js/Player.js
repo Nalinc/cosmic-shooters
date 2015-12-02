@@ -13,8 +13,6 @@
 		this.height = 10;
 		this.angle= 5;
 		this.alive = false; // Is true if the bullet is currently in use
-		this.fire = new Image();
-		this.fire.src="images/bullet.png";
 		this.count = 0;
 		this.speed=  3;
 	}
@@ -88,7 +86,7 @@
 		 * Grabs the last item in the list and initializes it and
 		 * pushes it to the front of the array.
 		 */
-		this.get = function(x, y, angle, speed) {
+		this.get = function(angle, x, y, speed) {
 			if(!pool[size - 1].alive) {
 				pool[size - 1].spawn(x, y, angle, speed);
 				pool.unshift(pool.pop());
@@ -102,8 +100,8 @@
 		this.getTwo = function(angle, x1, y1, speed1, x2, y2, speed2) {
 			if(!pool[size - 1].alive &&
 			   !pool[size - 2].alive) {
-					this.get(x1, y1, angle, speed1);
-					this.get(x2, y2, angle, speed2);
+					this.get(angle, x1, y1, speed1);
+					this.get(angle, x2, y2, speed2);
 				 }
 		};
 		/*
@@ -142,8 +140,9 @@
 		this.fireRate = 15;
 		this.counter = 0;
 		this.isFiring = false;
+		this.fireTap = false;
 
-		this.angle = this.orientation || 5;
+		this.angle = this.orientation || 1;
 		this.id=''
 		this.moveAmount = 2;
 		
@@ -192,8 +191,45 @@
 
 		this.fire = function(xcord, ycord, direction) {
 			console.log('fire fire')
-			this.bulletPool.get(xcord, ycord , direction, 3);
-		};		
+			this.bulletPool.get(direction, xcord, ycord , 3);
+//			this.bulletPool.getTwo(direction, xcord-20, ycord , 3, xcord+20, ycord, 3);			
+		};
+		this.moveForward = function(){
+			if(this.y <= 34)
+				this.y = 35;
+			else
+				this.y -= this.	moveAmount * Math.cos(this.angle/180*Math.PI);					
+			if(this.x<=34)
+				this.x= 35;
+			else
+				this.x += this.	moveAmount * Math.sin(this.angle/180*Math.PI);			
+		};
+
+		this.moveBackward = function(){
+			if(this.y <= 34)
+				this.y = 35;
+			else
+				this.y += this.	moveAmount * Math.cos(this.angle/180*Math.PI);
+			if(this.x<=34)
+				this.x= 35;
+			else
+				this.x -= this.	moveAmount * Math.sin(this.angle/180*Math.PI);
+		};
+
+		this.rotateRight = function(){
+			this.angle += this.	moveAmount;
+			if(this.angle>=360)
+				this.angle = 0;
+			this.angle += this.	moveAmount;			
+		};
+
+		this.rotateLeft = function(){
+			this.angle -= this.	moveAmount;
+			if(this.angle<=0)
+				this.angle = 360;			
+			this.angle -= this.	moveAmount;
+		}
+
 
 	}
 	
@@ -204,30 +240,19 @@
 			this.isFiring = false;
 			
 			this.counter++;
-				
 			// Up key takes priority over down
-			if (keys.up) {
-				this.y -= this.	moveAmount * Math.cos(this.angle/180*Math.PI);
-				this.x += this.	moveAmount * Math.sin(this.angle/180*Math.PI);
-			} else if (keys.down) {
-				this.y += this.	moveAmount * Math.cos(this.angle/180*Math.PI);
-				this.x -= this.	moveAmount * Math.sin(this.angle/180*Math.PI);
-			};
+			if (keys.up ||  motionDetect.x > 5)
+				this.moveForward();
+			else if (keys.down ||  motionDetect.x < -5)
+				this.moveBackward();
 
 			// Left key takes priority over right
-			if (keys.left) {
-				this.angle -= this.	moveAmount;
-				if(this.angle<=0)
-					this.angle = 360;			
-				this.angle -= this.	moveAmount;
-			} else if (keys.right) {
-				this.angle += this.	moveAmount;
-				if(this.angle>=360)
-					this.angle = 0;
-				this.angle += this.	moveAmount;
-			};
+			if (keys.left ||  motionDetect.y < -2)
+				this.rotateLeft();
+			else if (keys.right || motionDetect.y > 2)
+				this.rotateRight();
 
-			if (keys.space && this.counter >= this.fireRate) {
+			if ((keys.space || this.fireTap) && this.counter >= this.fireRate) {
 				console.log('fire');
 				this.fire(this.x-camera.xView, this.y-camera.yView, this.angle);
 				this.counter = 0;

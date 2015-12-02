@@ -9,7 +9,6 @@ var Keys = function(up, left, right, down, space) {
 		space = space || false;
 		
 	var onKeyDown = function(e) {
-		console.log(e)
 		var that = this,
 			c = e.keyCode;
 		switch (c) {
