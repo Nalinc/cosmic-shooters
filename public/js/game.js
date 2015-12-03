@@ -73,7 +73,7 @@ function init() {
 	camera.follow(localPlayer, canvas.width/2, canvas.height/2);
 
 	// Initialise socket connection
-	socket = io.connect('192.168.1.57:8000');
+	socket = io.connect('http://localhost:8000');
 
 	// Initialise remote players array
 	remotePlayers = [];
@@ -173,7 +173,6 @@ function onMovePlayer(data) {
 		console.log("Player not found: "+data.id);
 		return;
 	};
-	console.log(data)
 	// Update player position
 	movePlayer.setX(data.x);
 	movePlayer.setY(data.y);
@@ -217,6 +216,8 @@ function detectCollision() {
 				 objects[x].y + objects[x].height > obj[y].y))
 			{
 				objects[x].isColliding = true;
+				objects[x].alive = false;
+				obj[y].alive = false;
 				obj[y].isColliding = true;
 			}
 		}
@@ -259,7 +260,6 @@ function draw() {
 	quadTree.insert(localPlayer.bulletPool.getPool());
 	quadTree.insert(remotePlayers);
 
-	detectCollision();
 
 	// Wipe the canvas clean
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -280,8 +280,9 @@ function draw() {
 		quadTree.insert(remotePlayers[i].bulletPool.getPool());
 		if(!remotePlayers[i].isColliding)
 			remotePlayers[i].draw(ctx,camera.xView, camera.yView);
-		remotePlayers[i].bulletPool.animate(ctx,camera.xView, camera.yView);
+			remotePlayers[i].bulletPool.animate(ctx,camera.xView, camera.yView);
 	};
+	detectCollision();
 
 };
 

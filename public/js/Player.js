@@ -18,7 +18,6 @@
 		this.isColliding = false;
 		this.type=type || 'playerbullet';
 		this.collidableWith = (type=='enemybullet')?'player':'enemy';
-		console.log(type)
 	}
 	/*
 	 * Sets the bullet values
@@ -38,7 +37,6 @@
 	 */
 	Bullet.prototype.draw = function(ctx, xView, yView) {
 
-		console.log(this.type + "---"+ this.collidableWith)
 		ctx.clearRect(this.x, this.y, this.width, this.height);
 //		this.y -= this.speed;
 		this.y -= this.speed * Math.cos(this.angle/180*Math.PI);
@@ -54,6 +52,7 @@
 			ctx.restore();
 //			ctx.drawImage(this.fire, localPlayer.x, localPlayer.y);
 		}
+
 	};
 	/*
 	 * Resets the bullet values
@@ -86,7 +85,7 @@
 			var bullettype = (type=='player')?'playerbullet':'enemybullet';
 			for (var i = 0; i < size; i++) {
 				// Initalize the bullet object
-				var bullet = new Game.Bullet(0,0, 10, 10,bullettype); //x,y,width,height
+				var bullet = new Game.Bullet(bullettype); //x,y,width,height,type
 				pool[i] = bullet;
 			}
 		};
@@ -160,7 +159,7 @@
 		this.fireTap = false;
 		this.isColliding = false;
 		this.type= type;
-		this.collidableWith = 'enemybullet'
+		this.collidableWith = (type=='player')?'enemybullet':'playerbullet'
 
 		this.angle = this.orientation || 1;
 		this.id=''
