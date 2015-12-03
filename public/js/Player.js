@@ -7,7 +7,7 @@
  * drawn on the "main" canvas.
  */
  (function(){
-	function Bullet() {
+	function Bullet(type) {
 
 		this.width = 10;
 		this.height = 10;
@@ -16,6 +16,9 @@
 		this.count = 0;
 		this.speed=  3;
 		this.isColliding = false;
+		this.type=type || 'playerbullet';
+		this.collidableWith = (type=='enemybullet')?'player':'enemy';
+		console.log(type)
 	}
 	/*
 	 * Sets the bullet values
@@ -34,10 +37,8 @@
 	 * the bullet.
 	 */
 	Bullet.prototype.draw = function(ctx, xView, yView) {
-		if(this.isColliding){
-//			console.log('bullet collision')
-		}
 
+		console.log(this.type + "---"+ this.collidableWith)
 		ctx.clearRect(this.x, this.y, this.width, this.height);
 //		this.y -= this.speed;
 		this.y -= this.speed * Math.cos(this.angle/180*Math.PI);
@@ -80,10 +81,12 @@
 		/*
 		 * Populates the pool array with Bullet objects
 		 */
-		this.init = function() {
+		this.init = function(type) {
+			console.log(type)
+			var bullettype = (type=='player')?'playerbullet':'enemybullet';
 			for (var i = 0; i < size; i++) {
 				// Initalize the bullet object
-				var bullet = new Game.Bullet(0,0, 10, 10); //x,y,width,height
+				var bullet = new Game.Bullet(0,0, 10, 10,bullettype); //x,y,width,height
 				pool[i] = bullet;
 			}
 		};
@@ -141,21 +144,23 @@
 
 // wrapper for "class" Player
 (function(){
-	function Player(x, y, orientation, type){
+	function Player(x, y, orientation, shiptype, type){
 		// (x, y) = center of object
 		// ATTENTION:
 		// it represents the player position on the world(room), not the canvas position
 		this.x = x;
 		this.y = y;
 		this.ship = new Image();
-		this.shipType= type;
+		this.shipType= shiptype;
 		this.bulletPool = new Game.Pool(30);
-		this.bulletPool.init();
+		this.bulletPool.init(type);
 		this.fireRate = 15;
 		this.counter = 0;
 		this.isFiring = false;
 		this.fireTap = false;
 		this.isColliding = false;
+		this.type= type;
+		this.collidableWith = 'enemybullet'
 
 		this.angle = this.orientation || 1;
 		this.id=''
@@ -184,7 +189,7 @@
 			return this.angle;
 		};
 
-		this.getType = function() {
+		this.getShipType = function() {
 			return this.shipType;
 		};		
 
@@ -200,7 +205,7 @@
 			this.angle = newAngle;
 		};	
 
-		this.setType = function(newType) {
+		this.setShipType = function(newType) {
 			this.shipType = newType;
 		};
 
@@ -253,12 +258,12 @@
 				prevY = this.y,
 				prevAngle = this.angle;
 			this.isFiring = false;
-			
+				
 			this.counter++;
 			// Up key takes priority over down
-			if (keys.up ||  motionDetect.x > 5)
+			if (keys.up ||  motionDetect.x < -5 || motionDetect.x > 5)
 				this.moveForward();
-			else if (keys.down ||  motionDetect.x < -5)
+			else if (keys.down)
 				this.moveBackward();
 
 			// Left key takes priority over right
@@ -274,7 +279,7 @@
 				this.isFiring = true;
 			}
 			if(this.isColliding){
-	//			console.log('player collision')
+//				alert('player collision')
 			}
 			return (prevX != this.x || prevY != this.y || prevAngle != this.angle || this.isFiring) ? true : false;
 	}

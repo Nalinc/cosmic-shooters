@@ -61,19 +61,19 @@ function init() {
 	// Calculate a random start position for the local player
 	// The minus 5 (half a player size) stops the player being
 	// placed right on the egde of the screen
-	var startX = Math.round(Math.random()*(canvas.width-5)),
-		startY = Math.round(Math.random()*(canvas.height-5));
+	var startX = Math.round(Math.random()*(canvas.width/2)),
+		startY = Math.round(Math.random()*(canvas.height/2));
 
 	var shiptype = Math.floor(Math.random() * 9) + 0 ;
 	// Initialise the local player
-	localPlayer = new Game.Player(startX, startY, null, shiptype);
+	localPlayer = new Game.Player(startX, startY, null, shiptype,'player');
 
 	// setup the magic camera !!!
 	camera = new Game.Camera(0, 0, canvas.width, canvas.height, room.width, room.height);		
 	camera.follow(localPlayer, canvas.width/2, canvas.height/2);
 
 	// Initialise socket connection
-	socket = io.connect('http://localhost:8000');
+	socket = io.connect('192.168.1.57:8000');
 
 	// Initialise remote players array
 	remotePlayers = [];
@@ -144,7 +144,7 @@ function onSocketConnected() {
 	console.log("Connected to socket server");
 
 	// Send local player data to the game server
-	socket.emit("new player", {x: localPlayer.getX(), y: localPlayer.getY(), angle: localPlayer.getAngle(), type: localPlayer.getType()});
+	socket.emit("new player", {x: localPlayer.getX(), y: localPlayer.getY(), angle: localPlayer.getAngle(), type: localPlayer.getShipType()});
 };
 
 // Socket disconnected
@@ -157,7 +157,7 @@ function onNewPlayer(data) {
 	console.log("New player connected: "+data.id);
 	// Initialise the new player
 	console.log(data.type);
-	var newPlayer = new Game.Player(data.x, data.y, data.angle, data.type);
+	var newPlayer = new Game.Player(data.x, data.y, data.angle, data.type,'enemy');
 	newPlayer.id = data.id;
 
 	// Add new player to the remote players array
@@ -178,7 +178,8 @@ function onMovePlayer(data) {
 	movePlayer.setX(data.x);
 	movePlayer.setY(data.y);
 	movePlayer.setAngle(data.angle);
-	movePlayer.setType(data.type);
+	movePlayer.setShipType(data.type);
+
 	if(data.isFiring){
 		movePlayer.fire(movePlayer.getX()-camera.xView,movePlayer.getY()-camera.yView,movePlayer.getAngle());
 	}
@@ -242,7 +243,7 @@ function update() {
 	if (localPlayer.update(keys, room.width, room.height)) {
 		camera.update();
 		// Send local player data to the game server
-		socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY(), angle: localPlayer.getAngle(), type: localPlayer.getType(), isFiring: localPlayer.isFiring});
+		socket.emit("move player", {x: localPlayer.getX(), y: localPlayer.getY(), angle: localPlayer.getAngle(), type: localPlayer.getShipType(), isFiring: localPlayer.isFiring});
 	};
 };
 
@@ -267,7 +268,8 @@ function draw() {
 	room.map.draw(ctx, camera.xView, camera.yView);		
 
 	// Draw the local player
-	localPlayer.draw(ctx, camera.xView, camera.yView);
+	if(!localPlayer.isColliding)
+		localPlayer.draw(ctx, camera.xView, camera.yView);
 
 	localPlayer.bulletPool.animate(ctx,camera.xView, camera.yView);
     ctx.restore();
@@ -276,7 +278,8 @@ function draw() {
 	var i;
 	for (i = 0; i < remotePlayers.length; i++) {
 		quadTree.insert(remotePlayers[i].bulletPool.getPool());
-		remotePlayers[i].draw(ctx,camera.xView, camera.yView);
+		if(!remotePlayers[i].isColliding)
+			remotePlayers[i].draw(ctx,camera.xView, camera.yView);
 		remotePlayers[i].bulletPool.animate(ctx,camera.xView, camera.yView);
 	};
 
