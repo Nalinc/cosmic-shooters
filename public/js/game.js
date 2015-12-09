@@ -219,6 +219,9 @@ function detectCollision() {
 				objects[x].alive = false;
 				obj[y].alive = false;
 				obj[y].isColliding = true;
+				Game.createExplosion(obj[y].x, obj[y].y, "#525252");
+				Game.createExplosion(obj[y].x, obj[y].y, "#FFA318");
+
 			}
 		}
 	}
@@ -248,6 +251,19 @@ function update() {
 	};
 };
 
+function updateParticle (frameDelay)
+{
+	// draw a white background to clear canvas		
+	console.log(particles.length)
+	// update and draw particles
+	for (var i=0; i<particles.length; i++)
+	{
+		var particle = particles[i];
+		
+		particle.update();
+		particle.draw(ctx);
+	}
+}
 
 /**************************************************
 ** GAME DRAW
@@ -272,6 +288,10 @@ function draw() {
 		localPlayer.draw(ctx, camera.xView, camera.yView);
 
 	localPlayer.bulletPool.animate(ctx,camera.xView, camera.yView);
+
+
+	updateParticle()
+
     ctx.restore();
 
 	// Draw the remote players
