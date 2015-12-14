@@ -73,7 +73,7 @@ function init(nick) {
 	camera.follow(localPlayer, canvas.width/2, canvas.height/2);
 
 	// Initialise socket connection
-	socket = io.connect('192.168.1.57:8000');
+	socket = io.connect('localhost:8000');
 
 	// Initialise remote players array
 	remotePlayers = [];
@@ -88,6 +88,7 @@ function init(nick) {
 				localPlayer.alive = true;
 				localPlayer.type = 'player';
 				localPlayer.collidableWith = (localPlayer.type=='player')?'enemybullet':'playerbullet';
+				socket.emit("rejoin");
 			} else {
 				alert('no')
 			    window.close();
@@ -127,6 +128,9 @@ var setEventHandlers = function() {
 
 	// Player move message received
 	socket.on("move player", onMovePlayer);
+
+	// Player rejoined message received
+	socket.on("rejoin", onRejoin);
 
 	// Player removed message received
 	socket.on("remove player", onRemovePlayer);
@@ -196,6 +200,22 @@ function onMovePlayer(data) {
 	if(data.isFiring){
 		movePlayer.fire(movePlayer.getX()-camera.xView,movePlayer.getY()-camera.yView,movePlayer.getAngle());
 	}
+};
+
+// Player Rejoined
+function onRejoin(data) {
+	var rejoinedPlayer = playerById(data.id);
+	console.log(rejoinedPlayer)
+	// Player not found
+	if (!rejoinedPlayer) {
+		console.log("Player not found: "+data.id);
+		return;
+	};
+	rejoinedPlayer.isColliding = false;
+	rejoinedPlayer.alive = true;
+	rejoinedPlayer.type = 'enemy';
+	rejoinedPlayer.collidableWith = (rejoinedPlayer.type=='player')?'enemybullet':'playerbullet';
+
 };
 
 // Remove player

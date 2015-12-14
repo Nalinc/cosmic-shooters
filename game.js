@@ -56,6 +56,9 @@ function onSocketConnection(client) {
 
 	// Listen for move player message
 	client.on("move player", onMovePlayer);
+
+	// Listen for player rejoin message
+	client.on("rejoin", onRejoin);	
 };
 
 // Socket client has disconnected
@@ -119,6 +122,20 @@ function onMovePlayer(data) {
 	this.broadcast.emit("move player", {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), angle: movePlayer.getAngle(), type: movePlayer.getType(), isFiring: data.isFiring});
 };
 
+// Player has rejoined
+function onRejoin(data) {
+	// Find player in array
+	var rejoinedPlayer = playerById(this.id);
+
+	// Player not found
+	if (!rejoinedPlayer) {
+		console.log("Player not found: "+this.id);
+		return;
+	};
+
+	// Broadcast updated position to connected socket clients
+	this.broadcast.emit("rejoin", {id: rejoinedPlayer.id});
+};
 
 /**************************************************
 ** GAME HELPER FUNCTIONS
