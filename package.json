@@ -4,7 +4,7 @@
   "description": "A realtime multiplayer game",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node game.js"
   },
   "repository": {
     "type": "git",

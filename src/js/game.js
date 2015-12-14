@@ -73,7 +73,7 @@ function init(nick) {
 	camera.follow(localPlayer, canvas.width/2, canvas.height/2);
 
 	// Initialise socket connection
-	socket = io.connect('localhost:8000');
+	socket = io.connect(window.location.hostname);
 
 	// Initialise remote players array
 	remotePlayers = [];
