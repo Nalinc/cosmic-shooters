@@ -1,36 +1,41 @@
 <!DOCTYPE html>
-<html>
-<head>
-	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
-	<title></title>
-	<link rel="stylesheet" type="text/css" href="style.css">
-</head>
-<body>
-<div id="container">
-	<svg  >
 
+<html lang="en">
 
+	<head>
+		<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
 
-		<g id='obj'>
+		<title>cosmis shooters</title>
+		<meta charset="utf-8">
+		
+		<link rel="stylesheet" href="style/reset.css">
+		<link rel="stylesheet" href="style/game.css">
+	</head>
+	
+	<body>
+		<canvas id="gameCanvas"></canvas>			
 
-		  <rect id = "myRect"
-		      x = "100"
-		      y = "100"
-		      height = "50"
-		      width = "50"
-		      stroke-width = "2px"
-		      stroke = "green"
-		      fill = "yellow" />
-		</g>
-	</svg>
+		<script type="text/javascript" src="js/gyro.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript" src="js/quadtree.js"></script>
+		<script src="js/requestAnimationFrame.js"></script>
+		<script src="js/Map.js"></script>
+		<script src="js/camera.js"></script>
+		<script src="js/Keys.js"></script>
+		<script src="js/Player.js"></script>
+		<script src="js/game.js"></script>
 
-    <div class="arrow-up" id='arrow-up'></div>
-    <div class="arrow-down" id='arrow-down'></div>
-    <div class="arrow-left" id='arrow-left'></div>
-    <div class="arrow-right" id='arrow-right'></div>
+		<script>
 
-</div>
+		    var nickname = ""
 
-	<script type="text/javascript" src='crossfire.js'></script>
-</body>
+		    while(!nickname){
+		    	nickname = prompt("Please choose your nickname");
+		    }
+			// Initialise the game
+			init(nickname);
+			animate();
+		</script>
+
+	</body>
 </html>

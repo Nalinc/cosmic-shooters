@@ -11,7 +11,7 @@ var Player = require("./Player").Player;	// Player class
 
 
 app.set('port', (process.env.PORT || 8000))
-app.use(express.static(__dirname + '/public/'));
+app.use(express.static(__dirname + '/src/'));
 
 app.get('/', function(request, response) {
   response.render('index.html')
@@ -82,17 +82,17 @@ function onNewPlayer(data) {
 
 	var shiptype = Math.floor(Math.random() * 9) + 0 ;
 	// Create a new player
-	var newPlayer = new Player(data.x, data.y, data.type);
+	var newPlayer = new Player(data.nick, data.x, data.y, data.type);
 	newPlayer.id = this.id;
 
 	// Broadcast new player to connected socket clients
-	this.broadcast.emit("new player", {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY(), angle: newPlayer.getAngle(), type: newPlayer.getType()});
+	this.broadcast.emit("new player", {nick: data.nick, id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY(), angle: newPlayer.getAngle(), type: newPlayer.getType()});
 
 	// Send existing players to the new player
 	var i, existingPlayer;
 	for (i = 0; i < players.length; i++) {
 		existingPlayer = players[i];
-		this.emit("new player", {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY(), angle: existingPlayer.getAngle(), type: existingPlayer.getType()});
+		this.emit("new player", {nick: existingPlayer.getNick(), id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY(), angle: existingPlayer.getAngle(), type: existingPlayer.getType()});
 	};
 		
 	// Add new player to the players array

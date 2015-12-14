@@ -15,7 +15,7 @@ var particles = [];
 		this.angle= 5;
 		this.alive = false; // Is true if the bullet is currently in use
 		this.count = 0;
-		this.speed=  3;
+		this.speed=  7;
 		this.isColliding = false;
 		this.type=type || 'playerbullet';
 		this.collidableWith = (type=='enemybullet')?'player':'enemy';
@@ -240,10 +240,11 @@ var particles = [];
 
 // wrapper for "class" Player
 (function(){
-	function Player(x, y, orientation, shiptype, type){
+	function Player(nick, x, y, orientation, shiptype, type){
 		// (x, y) = center of object
 		// ATTENTION:
 		// it represents the player position on the world(room), not the canvas position
+		this.nick=nick;
 		this.x = x;
 		this.y = y;
 		this.ship = new Image();
@@ -252,15 +253,15 @@ var particles = [];
 		this.bulletPool.init(type);
 		this.fireRate = 15;
 		this.counter = 0;
+		this.alive = true; 
 		this.isFiring = false;
 		this.fireTap = false;
 		this.isColliding = false;
 		this.type= type;
 		this.collidableWith = (type=='player')?'enemybullet':'playerbullet'
-
 		this.angle = this.orientation || 1;
 		this.id=''
-		this.moveAmount = 2;
+		this.moveAmount = 4;
 		
 		var shipArray= ['A','B','C','D','E','F','G','H','I','J'];
 		console.log(this.shipType)
@@ -288,6 +289,10 @@ var particles = [];
 		this.getShipType = function() {
 			return this.shipType;
 		};		
+		
+		this.getNick = function() {
+			return this.nick;
+		};
 
 		this.setX = function(newX) {
 			this.x = newX;
@@ -307,7 +312,7 @@ var particles = [];
 
 		this.fire = function(xcord, ycord, direction) {
 			console.log('fire fire')
-			this.bulletPool.get(direction, xcord, ycord , 3);
+			this.bulletPool.get(direction, xcord, ycord , 5);
 //			this.bulletPool.getTwo(direction, xcord-20, ycord , 3, xcord+20, ycord, 3);			
 		};
 		this.moveForward = function(){
@@ -333,17 +338,17 @@ var particles = [];
 		};
 
 		this.rotateRight = function(){
-			this.angle += this.	moveAmount;
+			this.angle += (this.moveAmount-2);
 			if(this.angle>=360)
 				this.angle = 0;
-			this.angle += this.	moveAmount;			
+			this.angle += (this.moveAmount-2);			
 		};
 
 		this.rotateLeft = function(){
-			this.angle -= this.	moveAmount;
+			this.angle -= (this.moveAmount-2);
 			if(this.angle<=0)
 				this.angle = 360;			
-			this.angle -= this.	moveAmount;
+			this.angle -= (this.moveAmount-2);
 		}
 
 
@@ -368,7 +373,7 @@ var particles = [];
 			else if (keys.right || motionDetect.y > 2)
 				this.rotateRight();
 
-			if ((keys.space || this.fireTap) && this.counter >= this.fireRate) {
+			if ((keys.space || this.fireTap) && this.counter >= this.fireRate && this.alive) {
 				console.log('fire');
 				this.fire(this.x-camera.xView, this.y-camera.yView, this.angle);
 				this.counter = 0;
@@ -377,6 +382,8 @@ var particles = [];
 			if(this.isColliding){
 //				alert('player collision')
 			}
+
+
 			return (prevX != this.x || prevY != this.y || prevAngle != this.angle || this.isFiring) ? true : false;
 	}
 	
@@ -390,7 +397,8 @@ var particles = [];
 //		context.fillRect(-this.ship.width/2,-this.ship.height/2,64,64)
 		context.drawImage(this.ship,-32,-32,64,64);
 		context.restore();
-
+		context.fillStyle = "white";
+		context.fillText(this.nick,(this.x-32) - xView, (this.y-32) - yView+72);
 /*
 		context.save();
 		context.fillStyle = "white";

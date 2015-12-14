@@ -17,7 +17,7 @@ var canvas,			// Canvas DOM element
 /**************************************************
 ** GAME INITIALISATION
 **************************************************/
-function init() {
+function init(nick) {
 	// Declare the canvas and rendering context
 	canvas = document.getElementById("gameCanvas");
 	ctx = canvas.getContext("2d");
@@ -66,20 +66,34 @@ function init() {
 
 	var shiptype = Math.floor(Math.random() * 9) + 0 ;
 	// Initialise the local player
-	localPlayer = new Game.Player(startX, startY, null, shiptype,'player');
+	localPlayer = new Game.Player(nick,startX, startY, null, shiptype,'player');
 
 	// setup the magic camera !!!
 	camera = new Game.Camera(0, 0, canvas.width, canvas.height, room.width, room.height);		
 	camera.follow(localPlayer, canvas.width/2, canvas.height/2);
 
 	// Initialise socket connection
-	socket = io.connect('http://localhost:8000');
+	socket = io.connect('192.168.1.57:8000');
 
 	// Initialise remote players array
 	remotePlayers = [];
 
 	// Start listening for events
 	setEventHandlers();
+
+	setInterval(function(){
+		if(!localPlayer.alive){
+			if (confirm('You were hit by an enemy bullet, wanna continue?')) {
+				localPlayer.isColliding = false;
+				localPlayer.alive = true;
+				localPlayer.type = 'player';
+				localPlayer.collidableWith = (localPlayer.type=='player')?'enemybullet':'playerbullet';
+			} else {
+				alert('no')
+			    window.close();
+			}
+		}
+	},5000)
 };
 
 
@@ -144,7 +158,7 @@ function onSocketConnected() {
 	console.log("Connected to socket server");
 
 	// Send local player data to the game server
-	socket.emit("new player", {x: localPlayer.getX(), y: localPlayer.getY(), angle: localPlayer.getAngle(), type: localPlayer.getShipType()});
+	socket.emit("new player", {nick: localPlayer.getNick(), x: localPlayer.getX(), y: localPlayer.getY(), angle: localPlayer.getAngle(), type: localPlayer.getShipType()});
 };
 
 // Socket disconnected
@@ -157,7 +171,7 @@ function onNewPlayer(data) {
 	console.log("New player connected: "+data.id);
 	// Initialise the new player
 	console.log(data.type);
-	var newPlayer = new Game.Player(data.x, data.y, data.angle, data.type,'enemy');
+	var newPlayer = new Game.Player(data.nick, data.x, data.y, data.angle, data.type,'enemy');
 	newPlayer.id = data.id;
 
 	// Add new player to the remote players array
@@ -217,6 +231,14 @@ function detectCollision() {
 			{
 				objects[x].isColliding = true;
 				objects[x].alive = false;
+				if(objects[x].shipType){
+					objects[x].collidableWith = 'none';
+					objects[x].type = 'dead';
+				}
+				else if(obj[y].shipType){
+					obj[y].collidableWith = 'none';
+					obj[y].type = 'dead';
+				}
 				obj[y].alive = false;
 				obj[y].isColliding = true;
 				Game.createExplosion(obj[y].x, obj[y].y, "#525252");

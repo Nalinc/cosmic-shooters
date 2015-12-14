@@ -1,8 +1,9 @@
 /**************************************************
 ** GAME PLAYER CLASS
 **************************************************/
-var Player = function(startX, startY, type) {
-	var x = startX,
+var Player = function(nickname, startX, startY, type) {
+	var nick = nickname,
+		x = startX,
 		y = startY,
 		angle = 5,
 		shipType = type,
@@ -23,7 +24,11 @@ var Player = function(startX, startY, type) {
 	
 	var getType = function() {
 		return shipType;
-	};	
+	};
+
+	var getNick = function() {
+		return nick;
+	};
 
 	var setX = function(newX) {
 		x = newX;
@@ -47,6 +52,7 @@ var Player = function(startX, startY, type) {
 		getY: getY,
 		getAngle: getAngle,
 		getType: getType,
+		getNick: getNick,
 		setX: setX,
 		setY: setY,
 		setAngle: setAngle,
