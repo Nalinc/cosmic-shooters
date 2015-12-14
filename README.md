@@ -1,2 +1,2 @@
-# crossfire
+# cosmic shooters
 A realtime multiplayer game
