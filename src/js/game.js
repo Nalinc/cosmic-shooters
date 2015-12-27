@@ -17,7 +17,7 @@ var canvas,			// Canvas DOM element
 /**************************************************
 ** GAME INITIALISATION
 **************************************************/
-function init(nick) {
+function init(nick, shiptype) {
 	// Declare the canvas and rendering context
 	canvas = document.getElementById("gameCanvas");
 	ctx = canvas.getContext("2d");
@@ -45,7 +45,7 @@ function init(nick) {
 			motionDetect = o;
 	});
 
-	quadTree = new QuadTree({x:0,y:0,width:canvas.width,height:canvas.height});
+	quadTree = new QuadTree({x:0,y:0,width:5000,height:3000});
 
 	// setup an object that represents the room
 	room = {
@@ -64,7 +64,7 @@ function init(nick) {
 	var startX = Math.round(Math.random()*(canvas.width/2)),
 		startY = Math.round(Math.random()*(canvas.height/2));
 
-	var shiptype = Math.floor(Math.random() * 9) + 0 ;
+//	var shiptype = Math.floor(Math.random() * 9) + 0 ;
 	// Initialise the local player
 	localPlayer = new Game.Player(nick,startX, startY, null, shiptype,'player');
 
@@ -73,7 +73,7 @@ function init(nick) {
 	camera.follow(localPlayer, canvas.width/2, canvas.height/2);
 
 	// Initialise socket connection
-	socket = io.connect(window.location.hostname);
+	socket = io.connect('localhost:8000');
 
 	// Initialise remote players array
 	remotePlayers = [];
@@ -242,6 +242,9 @@ function detectCollision() {
 
 		for (y = 0, length = obj.length; y < length; y++) {
 
+			if(objects[x].type=='enemybullet'||obj[y].type=='enemybullet')
+				console.log("type="+objects[x].type+",x "+objects[x].x+"----"+"type="+obj[y].type+",x "+obj[y].x)
+
 			// DETECT COLLISION ALGORITHM
 			if (objects[x].collidableWith === obj[y].type &&
 				(objects[x].x < obj[y].x + obj[y].width &&
@@ -263,7 +266,6 @@ function detectCollision() {
 				obj[y].isColliding = true;
 				Game.createExplosion(obj[y].x, obj[y].y, "#525252");
 				Game.createExplosion(obj[y].x, obj[y].y, "#FFA318");
-
 			}
 		}
 	}
